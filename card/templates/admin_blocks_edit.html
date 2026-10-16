@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Изменение блока - Администрирование{% endblock %}
+{% block page_title %}Изменение блока «{{ block.name }}»{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Название блока <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" value="{{ block.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Путь / ссылка к блоку <span class="text-danger">*</span></label>
+                        <input type="text" name="url" class="form-control" value="{{ block.url }}" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Значок</label>
+                            <select name="icon" class="form-select">
+                                {% for code, label in icons.items() %}
+                                <option value="{{ code }}" {% if block.icon == code %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Порядок в меню</label>
+                            <input type="number" name="order" class="form-control" value="{{ block.order|default(0) }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Кому разрешен вход в блок</label>
+                        <div class="border rounded p-2" style="max-height:220px;overflow-y:auto;">
+                            {% for e in employees %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="allowed_logins" value="{{ e.login }}"
+                                       id="emp_{{ e.id }}" {% if e.login in (block.allowed_logins or []) %}checked{% endif %}>
+                                <label class="form-check-label small" for="emp_{{ e.id }}">
+                                    {{ e.full_name }} ({{ e.login }})
+                                    {% if 'admin' in e.roles %}<span class="badge bg-secondary">админ</span>{% endif %}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-text">Если никого не отмечать — блок доступен всем сотрудникам. Администраторы имеют доступ всегда.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Сохранить</button>
+                    <a href="{{ url_for('admin_blocks') }}" class="btn btn-outline-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
