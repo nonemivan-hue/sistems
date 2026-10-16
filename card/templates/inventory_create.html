@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание инвентаризации - Система инвентаризации карт</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
+        .header { background: #007bff; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; }
+        .nav { background: #333; padding: 10px 20px; }
+        .nav a { color: white; text-decoration: none; margin-right: 20px; padding: 8px 16px; border-radius: 4px; }
+        .nav a:hover { background: #555; }
+        .content { padding: 40px; max-width: 1200px; margin: 0 auto; }
+        .form-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .card-list { max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; }
+        .card-item { padding: 10px; border-bottom: 1px solid #eee; }
+        .card-item:last-child { border-bottom: none; }
+        .card-item label { display: inline; font-weight: normal; margin-left: 10px; }
+        .btn { display: inline-block; padding: 12px 24px; border-radius: 4px; text-decoration: none; cursor: pointer; border: none; font-size: 14px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-secondary { background: #6c757d; color: white; margin-right: 10px; }
+        .btn-secondary:hover { background: #545b62; }
+        .flash-messages { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Система инвентаризации карт</h1>
+        <a href="{{ url_for('logout') }}" style="background: #dc3545; padding: 8px 16px; border-radius: 4px; color: white; text-decoration: none;">Выйти ({{ current_user.username }})</a>
+    </div>
+    <div class="nav">
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('docs') }}">Документы</a>
+        <a href="{{ url_for('cards_list') }}">Карты</a>
+    </div>
+    <div class="content">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="form-container">
+            <h2>Создание новой инвентаризации</h2>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="title">Название инвентаризации:</label>
+                    <input type="text" id="title" name="title" required placeholder="Введите название инвентаризации">
+                </div>
+                
+                <div class="form-group">
+                    <label>Выберите карты для инвентаризации:</label>
+                    <div class="card-list">
+                        {% for card in cards %}
+                        <div class="card-item">
+                            <input type="checkbox" id="card_{{ card.id }}" name="cards" value="{{ card.id }}">
+                            <label for="card_{{ card.id }}">{{ card.card_number }} - {{ card.holder_name }} ({{ card.department }})</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <a href="{{ url_for('docs') }}" class="btn btn-secondary">Отмена</a>
+                    <button type="submit" class="btn btn-primary">Создать инвентаризацию</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

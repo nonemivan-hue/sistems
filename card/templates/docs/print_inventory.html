@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Инвентаризационная опись {{ inv.doc_number }}</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 14px; margin: 40px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h2 { text-transform: uppercase; margin-bottom: 5px; }
+        .header p { margin: 2px 0; }
+        .info-block { margin-bottom: 20px; }
+        .info-block p { margin: 3px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        table, th, td { border: 1px solid black; }
+        th, td { padding: 6px; text-align: left; }
+        th { background: #f0f0f0; }
+        .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
+        .signature-block { width: 30%; }
+        .signature-line { border-top: 1px solid black; margin-top: 30px; padding-top: 5px; }
+        @media print {
+            .no-print { display: none; }
+            body { margin: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()">Печать</button>
+        <button onclick="window.close()">Закрыть</button>
+    </div>
+
+    <div class="header">
+        <h2>Инвентаризационная опись карт</h2>
+        <p>№ {{ inv.doc_number }} от {{ inv.doc_date }}</p>
+    </div>
+
+    <div class="info-block">
+        <p><strong>Основание:</strong> приказ № {{ inv.order_number }} от {{ inv.order_date }}</p>
+        <p><strong>Председатель комиссии:</strong> {{ chairman.full_name if chairman else '' }}</p>
+        <p><strong>Члены комиссии:</strong>
+            {% for cid in inv.committee_ids or [] %}
+                {{ emp_map[cid].full_name if cid in emp_map else '' }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+
+    <h3>Бухгалтерский учет (наличие по данным учета)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width:40px">№ п/п</th>
+                <th>Номер карты</th>
+                <th>Вид карты</th>
+                <th>Статус</th>
+                <th>ФИО владельца</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in inv.accounting_lines or [] %}
+            <tr>
+                <td>{{ line.line_no }}</td>
+                <td>{{ line.card_number }}</td>
+                <td>{{ ct_map.get(line.card_type_id, {}).get('print_name', '') }}</td>
+                <td>{{ line.card_status }}</td>
+                <td>{{ line.owner_name or '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if inv.actual_lines and inv.actual_lines|length > 0 %}
+    <h3>Фактическое наличие</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width:40px">№ п/п</th>
+                <th>Номер карты</th>
+                <th>Вид карты</th>
+                <th>Статус</th>
+                <th>ФИО владельца</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in inv.actual_lines %}
+            <tr>
+                <td>{{ line.line_no }}</td>
+                <td>{{ line.card_number }}</td>
+                <td>{{ ct_map.get(line.card_type_id, {}).get('print_name', '') }}</td>
+                <td>{{ line.card_status }}</td>
+                <td>{{ line.owner_name or '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if inv.discrepancy_lines and inv.discrepancy_lines|length > 0 %}
+    <h3>Расхождения</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width:40px">№ п/п</th>
+                <th>Тип расхождения</th>
+                <th>Номер карты</th>
+                <th>Вид карты</th>
+                <th>Статус</th>
+                <th>ФИО владельца</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in inv.discrepancy_lines %}
+            <tr>
+                <td>{{ line.line_no }}</td>
+                <td>{{ line.discrepancy_type }}</td>
+                <td>{{ line.card_number }}</td>
+                <td>{{ ct_map.get(line.card_type_id, {}).get('print_name', '') }}</td>
+                <td>{{ line.card_status }}</td>
+                <td>{{ line.owner_name or '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <div class="signatures">
+        <div class="signature-block">
+            <p><strong>Председатель:</strong></p>
+            <div class="signature-line">{{ chairman.full_name if chairman else '_________________' }}</div>
+            <p style="font-size: 12px; color: #666;">(подпись, ФИО)</p>
+        </div>
+        <div class="signature-block">
+            <p><strong>Члены комиссии:</strong></p>
+            {% for cid in inv.committee_ids or [] %}
+                {% if cid in emp_map %}
+                <div class="signature-line">{{ emp_map[cid].full_name }}</div>
+                {% endif %}
+            {% endfor %}
+            <p style="font-size: 12px; color: #666;">(подписи, ФИО)</p>
+        </div>
+    </div>
+</body>
+</html>

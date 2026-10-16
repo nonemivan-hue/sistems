@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр инвентаризации - Система инвентаризации карт</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
+        .header { background: #007bff; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; }
+        .nav { background: #333; padding: 10px 20px; }
+        .nav a { color: white; text-decoration: none; margin-right: 20px; padding: 8px 16px; border-radius: 4px; }
+        .nav a:hover { background: #555; }
+        .content { padding: 40px; max-width: 1200px; margin: 0 auto; }
+        .info-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .actions { margin-bottom: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; border-radius: 4px; text-decoration: none; cursor: pointer; border: none; font-size: 14px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .status-draft { color: #6c757d; }
+        .status-completed { color: #28a745; }
+        .status-cancelled { color: #dc3545; }
+        .status-present { color: #28a745; }
+        .status-absent { color: #dc3545; }
+        .status-damaged { color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Система инвентаризации карт</h1>
+        <a href="{{ url_for('logout') }}" style="background: #dc3545; padding: 8px 16px; border-radius: 4px; color: white; text-decoration: none;">Выйти ({{ current_user.username }})</a>
+    </div>
+    <div class="nav">
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('docs') }}">Документы</a>
+        <a href="{{ url_for('cards_list') }}">Карты</a>
+    </div>
+    <div class="content">
+        <div class="info-panel">
+            <h2>{{ inventory.title }}</h2>
+            <p><strong>ID:</strong> {{ inventory.id }}</p>
+            <p><strong>Дата создания:</strong> {{ inventory.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+            <p><strong>Статус:</strong> <span class="status-{{ inventory.status }}">{{ inventory.status }}</span></p>
+            <p><strong>Создатель:</strong> {{ inventory.creator.username if inventory.creator else 'Неизвестно' }}</p>
+        </div>
+        
+        <div class="actions">
+            {% if inventory.status == 'draft' %}
+                <a href="{{ url_for('conduct_inventory', inventory_id=inventory.id) }}" class="btn btn-success">Провести инвентаризацию</a>
+            {% endif %}
+            <a href="{{ url_for('print_inventory', inventory_id=inventory.id) }}" class="btn btn-info">Печать отчета</a>
+            <a href="{{ url_for('docs') }}" class="btn btn-secondary">Назад к списку</a>
+        </div>
+        
+        <h3>Элементы инвентаризации</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Номер карты</th>
+                    <th>Владелец</th>
+                    <th>Отдел</th>
+                    <th>Статус проверки</th>
+                    <th>Комментарии</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventory.items %}
+                <tr>
+                    <td>{{ item.card.card_number }}</td>
+                    <td>{{ item.card.holder_name }}</td>
+                    <td>{{ item.card.department }}</td>
+                    <td class="status-{{ item.actual_status or 'none' }}">{{ item.actual_status or 'Не проверено' }}</td>
+                    <td>{{ item.comments or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
