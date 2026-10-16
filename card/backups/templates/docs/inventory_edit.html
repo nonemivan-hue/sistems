@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% block title %}Инвентаризация № {{ inv.doc_number }}{% endblock %}
+{% block page_title %}Инвентаризация карт № {{ inv.doc_number }} от {{ inv.doc_date }}{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                {% if inv.status == 'posted' %}
+                <span class="badge bg-success fs-6">Проведен {{ inv.posted_at[:10] if inv.posted_at else '' }}</span>
+                {% else %}
+                <span class="badge bg-secondary fs-6">Черновик</span>
+                {% endif %}
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('inventory_print', inv_id=inv.id) }}" target="_blank" class="btn btn-outline-primary">
+                    <i class="bi bi-printer"></i> Печать
+                </a>
+                {% if inv.status != 'posted' %}
+                <form method="POST" action="{{ url_for('inventory_post', inv_id=inv.id) }}" onsubmit="return confirm('Провести инвентаризацию?');">
+                    <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Провести</button>
+                </form>
+                {% endif %}
+                <form method="POST" action="{{ url_for('inventory_delete', inv_id=inv.id) }}" onsubmit="return confirm('Удалить инвентаризацию?');">
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Удалить</button>
+                </form>
+            </div>
+        </div>
+
+        <form method="POST" id="inventoryForm">
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Номер документа</label>
+                    <input type="text" name="doc_number" class="form-control" value="{{ inv.doc_number }}" {% if inv.status=='posted' %}readonly{% endif %}>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Дата документа</label>
+                    <input type="date" name="doc_date" class="form-control" value="{{ inv.doc_date }}" {% if inv.status=='posted' %}readonly{% endif %}>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Автор</label>
+                    <input type="text" class="form-control" value="{{ author.full_name if author else '—' }}" readonly>
+                </div>
+            </div>
+
+            <hr class="my-4">
+            <h5>1. Информационная вкладка</h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Приказ №</label>
+                    <input type="text" name="order_number" class="form-control" value="{{ inv.order_number or '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Дата приказа</label>
+                    <input type="date" name="order_date" class="form-control" value="{{ inv.order_date or '' }}">
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Председатель комиссии</label>
+                    <select name="chairman_id" class="form-select" {% if inv.status=='posted' %}disabled{% endif %}>
+                        <option value="">Не выбран</option>
+                        {% for emp in employees %}
+                        <option value="{{ emp.id }}" {% if inv.chairman_id==emp.id %}selected{% endif %}>{{ emp.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">Члены комиссии (до 5)</label>
+                    <select name="committee_ids" class="form-select" multiple size="5" {% if inv.status=='posted' %}disabled{% endif %}>
+                        {% for emp in employees %}
+                        <option value="{{ emp.id }}" {% if emp.id in inv.committee_ids|default([])|map(attribute='string')|list or emp.id|string in inv.committee_ids|default([]) %}selected{% endif %}>{{ emp.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Удерживайте Ctrl для выбора нескольких</small>
+                </div>
+            </div>
+
+            <hr class="my-4">
+            <h5>Фильтры для отбора карт</h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Статус карты</label>
+                    <select name="card_status_filter" class="form-select" {% if inv.status=='posted' %}disabled{% endif %}>
+                        <option value="">Все статусы</option>
+                        <option value="ready_to_print" {% if inv.card_status_filter=='ready_to_print' %}selected{% endif %}>Готова к печати</option>
+                        <option value="ready_to_issue" {% if inv.card_status_filter=='ready_to_issue' %}selected{% endif %}>Готова к выдаче</option>
+                        <option value="issued" {% if inv.card_status_filter=='issued' %}selected{% endif %}>Выдана</option>
+                        <option value="defect" {% if inv.card_status_filter=='defect' %}selected{% endif %}>Брак</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Вид карты</label>
+                    <select name="card_type_filter" class="form-select" {% if inv.status=='posted' %}disabled{% endif %}>
+                        <option value="">Все виды</option>
+                        {% for ct in card_types %}
+                        <option value="{{ ct.id }}" {% if inv.card_type_filter==ct.id %}selected{% endif %}>{{ ct.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if inv.status != 'posted' %}
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-primary w-100" onclick="fillAccounting()">
+                        <i class="bi bi-arrow-right-circle"></i> Заполнить по учету
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mt-4" id="inventoryTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="accounting-tab" data-bs-toggle="tab" data-bs-target="#accounting" type="button">По учету</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="actual-tab" data-bs-toggle="tab" data-bs-target="#actual" type="button">По факту</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="discrepancies-tab" data-bs-toggle="tab" data-bs-target="#discrepancies" type="button">Расхождения</button>
+                </li>
+            </ul>
+
+            <div class="tab-content p-3 border border-top-0">
+                <!-- Tab 1: По учету -->
+                <div class="tab-pane fade show active" id="accounting" role="tabpanel">
+                    <table class="table table-sm table-bordered" id="accountingTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">№ п/п</th>
+                                <th style="width: 25%;">Номер карты</th>
+                                <th style="width: 30%;">Вид карты</th>
+                                <th style="width: 20%;">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in inv.accounting_lines|default([]) %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ line.card_number }}</td>
+                                <td>{{ ct_map.get(line.card_type_id, {}).name if line.card_type_id else '' }}</td>
+                                <td>{{ CARD_STATUSES.get(line.status, line.status) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">Нет данных</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 2: По факту -->
+                <div class="tab-pane fade" id="actual" role="tabpanel">
+                    {% if inv.status != 'posted' %}
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-outline-primary" onclick="copyFromAccounting()">
+                            <i class="bi bi-copy"></i> Заполнить по данным учета
+                        </button>
+                    </div>
+                    {% endif %}
+                    <table class="table table-sm table-bordered" id="actualTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">№ п/п</th>
+                                <th style="width: 25%;">Номер карты</th>
+                                <th style="width: 30%;">Вид карты</th>
+                                <th style="width: 20%;">Статус</th>
+                                {% if inv.status != 'posted' %}
+                                <th style="width: 20%;">Действия</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in inv.actual_lines|default([]) %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ line.card_number }}</td>
+                                <td>{{ ct_map.get(line.card_type_id, {}).name if line.card_type_id else '' }}</td>
+                                <td>{{ CARD_STATUSES.get(line.status, line.status) }}</td>
+                                {% if inv.status != 'posted' %}
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="removeActualLine({{ loop.index0 }})">Удалить</button>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center text-muted">Нет данных</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 3: Расхождения -->
+                <div class="tab-pane fade" id="discrepancies" role="tabpanel">
+                    {% if inv.status != 'posted' %}
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-warning" onclick="calculateDiscrepancies()">
+                            <i class="bi bi-calculator"></i> Рассчитать расхождения
+                        </button>
+                    </div>
+                    {% endif %}
+                    <table class="table table-sm table-bordered" id="discrepanciesTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">№ п/п</th>
+                                <th style="width: 20%;">Номер карты</th>
+                                <th style="width: 25%;">Вид карты</th>
+                                <th style="width: 15%;">Статус</th>
+                                <th style="width: 15%;">Излишек</th>
+                                <th style="width: 15%;">Недостача</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in inv.discrepancy_lines|default([]) %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ line.card_number }}</td>
+                                <td>{{ ct_map.get(line.card_type_id, {}).name if line.card_type_id else '' }}</td>
+                                <td>{{ CARD_STATUSES.get(line.status, line.status) }}</td>
+                                <td>{% if line.surplus %}✓{% endif %}</td>
+                                <td>{% if line.shortage %}✓{% endif %}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted">Нет расхождений</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if inv.status != 'posted' %}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a href="{{ url_for('inventory_journal') }}" class="btn btn-outline-secondary">Отмена</a>
+                <button type="button" class="btn btn-success" onclick="createDocsFromInventory()">
+                    <i class="bi bi-file-earmark-plus"></i> Создать документы по итогам
+                </button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<script>
+function fillAccounting() {
+    fetch('{{ url_for("api_inventory_fill_accounting", inv_id=inv.id) }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            status_filter: document.querySelector('select[name="card_status_filter"]').value,
+            type_filter: document.querySelector('select[name="card_type_filter"]').value
+        })
+    }).then(r => r.json()).then(d => {
+        if(d.success) location.reload();
+        else alert('Ошибка: ' + d.error);
+    });
+}
+
+function copyFromAccounting() {
+    fetch('{{ url_for("api_inventory_copy_to_actual", inv_id=inv.id) }}', {
+        method: 'POST'
+    }).then(r => r.json()).then(d => {
+        if(d.success) location.reload();
+        else alert('Ошибка: ' + d.error);
+    });
+}
+
+function calculateDiscrepancies() {
+    fetch('{{ url_for("api_inventory_calculate_discrepancies", inv_id=inv.id) }}', {
+        method: 'POST'
+    }).then(r => r.json()).then(d => {
+        if(d.success) location.reload();
+        else alert('Ошибка: ' + d.error);
+    });
+}
+
+function removeActualLine(idx) {
+    if(!confirm('Удалить строку?')) return;
+    fetch('{{ url_for("api_inventory_remove_actual_line", inv_id=inv.id) }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({line_index: idx})
+    }).then(r => r.json()).then(d => {
+        if(d.success) location.reload();
+        else alert('Ошибка: ' + d.error);
+    });
+}
+
+function createDocsFromInventory() {
+    if(!confirm('Создать документы по итогам инвентаризации?')) return;
+    fetch('{{ url_for("api_inventory_create_docs", inv_id=inv.id) }}', {
+        method: 'POST'
+    }).then(r => r.json()).then(d => {
+        if(d.success) {
+            alert('Создано документов: ' + d.count);
+            location.reload();
+        } else alert('Ошибка: ' + d.error);
+    });
+}
+</script>
+{% endblock %}

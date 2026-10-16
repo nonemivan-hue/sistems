@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Редактирование карты{% endblock %}
+{% block page_title %}Редактирование карты{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Номер карты (19 цифр)</label>
+                <input type="text" name="card_number" class="form-control" pattern="\d{19}" maxlength="19" value="{{ card.card_number }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Вид карты</label>
+                <select name="card_type_id" class="form-select" required>
+                    <option value="">-- выберите --</option>
+                    {% for ct in card_types %}
+                    <option value="{{ ct.id }}" {% if ct.id == card.card_type_id %}selected{% endif %}>{{ ct.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Статус</label>
+                <select name="status" class="form-select">
+                    <option value="">-- не указан --</option>
+                    <option value="ready_to_print" {% if card.status == 'ready_to_print' %}selected{% endif %}>Готова к печати</option>
+                    <option value="ready_to_issue" {% if card.status == 'ready_to_issue' %}selected{% endif %}>Готова к выдаче</option>
+                    <option value="issued" {% if card.status == 'issued' %}selected{% endif %}>Выдана</option>
+                    <option value="defect" {% if card.status == 'defect' %}selected{% endif %}>Брак</option>
+                    <option value="transferred_region" {% if card.status == 'transferred_region' %}selected{% endif %}>Передана в другой регион</option>
+                </select>
+            </div>
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Сохранить</button>
+                <a href="{{ url_for('ref_cards') }}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

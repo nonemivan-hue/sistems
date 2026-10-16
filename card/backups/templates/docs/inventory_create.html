@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Создание инвентаризации{% endblock %}
+{% block page_title %}Создание инвентаризации карт{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Номер</label>
+                    <input type="text" name="doc_number" class="form-control" placeholder="Авто">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Дата</label>
+                    <input type="date" name="doc_date" class="form-control" value="{{ current_date }}" required>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            <h5>1. Информационная вкладка</h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Приказ №</label>
+                    <input type="text" name="order_number" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Дата приказа</label>
+                    <input type="date" name="order_date" class="form-control">
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Председатель комиссии</label>
+                    <select name="chairman_id" class="form-select">
+                        <option value="">Не выбран</option>
+                        {% for emp in employees %}
+                        <option value="{{ emp.id }}">{{ emp.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">Члены комиссии (до 5)</label>
+                    <select name="committee_ids" class="form-select" multiple size="5">
+                        {% for emp in employees %}
+                        <option value="{{ emp.id }}">{{ emp.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Удерживайте Ctrl для выбора нескольких</small>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            <h5>Фильтры для отбора карт</h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Статус карты</label>
+                    <select name="card_status_filter" class="form-select">
+                        <option value="">Все статусы</option>
+                        <option value="ready_to_print">Готова к печати</option>
+                        <option value="ready_to_issue">Готова к выдаче</option>
+                        <option value="issued">Выдана</option>
+                        <option value="defect">Брак</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Вид карты</label>
+                    <select name="card_type_filter" class="form-select">
+                        <option value="">Все виды</option>
+                        {% for ct in card_types %}
+                        <option value="{{ ct.id }}">{{ ct.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Создать</button>
+                <a href="{{ url_for('inventory_journal') }}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
