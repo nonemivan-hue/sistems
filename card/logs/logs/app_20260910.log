@@ -1,0 +1,207 @@
+2026-09-10 13:37:04 | INFO     | Test log message
+2026-09-10 13:37:14 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.14ms
+2026-09-10 13:37:14 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.15ms
+2026-09-10 13:37:14 | INFO     | DB_OPERATION | table=action_log | op=SELECT | duration=127.00ms
+2026-09-10 13:37:14 | INFO     | DB_OPERATION | table=action_log | op=SAVE | duration=208.11ms
+2026-09-10 13:37:14 | INFO     | DB_OPERATION | table=action_log | op=INSERT
+2026-09-10 13:37:14 | INFO     | USER_ACTION | user_id=test-user-123 | action=TEST_ACTION | details=Testing logging to file | ip=
+2026-09-10 13:37:46 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.10ms
+2026-09-10 13:37:46 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.04ms
+2026-09-10 13:37:46 | INFO     | DB_OPERATION | table=action_log | op=SELECT | duration=89.41ms
+2026-09-10 13:37:46 | INFO     | DB_OPERATION | table=action_log | op=SAVE | duration=211.87ms
+2026-09-10 13:37:46 | INFO     | DB_OPERATION | table=action_log | op=INSERT
+2026-09-10 13:37:46 | INFO     | USER_ACTION | user_id=admin-user | action=SYSTEM_TEST | details=Testing logging system | ip=
+2026-09-10 13:37:46 | INFO     | DB_OPERATION | table=cards | op=SELECT | duration=62.30ms
+2026-09-10 16:09:08 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 16:09:08 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.03ms
+2026-09-10 16:09:08 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.09ms
+2026-09-10 16:09:08 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.23ms
+2026-09-10 16:09:15 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 16:09:15 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.04ms
+2026-09-10 16:09:15 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.10ms
+2026-09-10 16:09:15 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.25ms
+2026-09-10 16:09:26 | ERROR    | ERROR | context=load_all(employees) | connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+ | table=employees
+Traceback (most recent call last):
+  File "/workspace/postgres/storage_pg.py", line 118, in load_all
+    with get_cursor(dict_cursor=True) as cur:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/workspace/postgres/storage_pg.py", line 61, in get_cursor
+    with get_connection() as conn:
+         ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/workspace/postgres/storage_pg.py", line 49, in get_connection
+    conn = psycopg2.connect(**DB_CONFIG)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-09-10 17:06:33 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:06:33 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.04ms
+2026-09-10 17:06:33 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.09ms
+2026-09-10 17:06:33 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.25ms
+2026-09-10 17:06:38 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.10ms
+2026-09-10 17:06:38 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.05ms
+2026-09-10 17:06:38 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.07ms
+2026-09-10 17:06:40 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:06:40 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.04ms
+2026-09-10 17:06:40 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.09ms
+2026-09-10 17:06:40 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.21ms
+2026-09-10 17:06:48 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:06:48 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.05ms
+2026-09-10 17:06:48 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:06:48 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.19ms
+2026-09-10 17:06:52 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:06:52 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.05ms
+2026-09-10 17:06:52 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:06:52 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.20ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.05ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.09ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.18ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.18ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.07ms
+2026-09-10 17:06:55 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.15ms
+2026-09-10 17:07:01 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:07:01 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.05ms
+2026-09-10 17:07:01 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:07:01 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.20ms
+2026-09-10 17:07:01 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:07:01 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.21ms
+2026-09-10 17:07:08 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.16ms
+2026-09-10 17:07:08 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.19ms
+2026-09-10 17:07:08 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=133.45ms
+2026-09-10 17:07:08 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.14ms
+2026-09-10 17:07:08 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=132.55ms
+2026-09-10 17:07:09 | INFO     | DB_OPERATION | table=documents | op=SAVE | duration=306.00ms
+2026-09-10 17:07:09 | INFO     | DB_OPERATION | table=documents | op=INSERT
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.05ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.10ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.20ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=101.21ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=documents | op=SAVE | duration=331.39ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=documents | op=INSERT
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=116.81ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.19ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.53ms
+2026-09-10 17:07:18 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=109.22ms
+2026-09-10 17:07:19 | INFO     | DB_OPERATION | table=documents | op=SAVE | duration=325.12ms
+2026-09-10 17:07:19 | INFO     | DB_OPERATION | table=documents | op=DELETE | duration=325.37ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.11ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.04ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.08ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.21ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.07ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.16ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.07ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.15ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.07ms
+2026-09-10 17:07:27 | INFO     | DB_OPERATION | table=employees | op=FIND_ONE | duration=0.15ms
+2026-09-10 20:12:53 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.40ms
+2026-09-10 20:12:53 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.51ms
+2026-09-10 20:12:54 | INFO     | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.110.81:5000
+2026-09-10 20:12:54 | INFO     | [33mPress CTRL+C to quit[0m
+2026-09-10 20:12:54 | INFO     |  * Restarting with stat
+2026-09-10 20:12:55 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.27ms
+2026-09-10 20:12:55 | INFO     | DB_OPERATION | table=constants | op=SELECT | duration=0.35ms
+2026-09-10 20:12:55 | WARNING  |  * Debugger is active!
+2026-09-10 20:12:55 | INFO     |  * Debugger PIN: 340-698-443
+2026-09-10 20:13:05 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.42ms
+2026-09-10 20:13:05 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:05] "POST /login HTTP/1.1" 200 -
+2026-09-10 20:13:15 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.38ms
+2026-09-10 20:13:15 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:15] "POST /login HTTP/1.1" 200 -
+2026-09-10 20:13:30 | INFO     | DB_OPERATION | table=action_log | op=SELECT | duration=119.78ms
+2026-09-10 20:13:30 | INFO     | DB_OPERATION | table=action_log | op=SAVE | duration=480.38ms
+2026-09-10 20:13:30 | INFO     | DB_OPERATION | table=action_log | op=INSERT
+2026-09-10 20:13:30 | INFO     | USER_ACTION | user_id=2748740a-f7af-47cc-b95c-fd7e4f8635b2 | action=LOGIN | details=User admin logged in | ip=
+2026-09-10 20:13:30 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:30] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-10 20:13:30 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.60ms
+2026-09-10 20:13:30 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:30] "GET / HTTP/1.1" 200 -
+2026-09-10 20:13:34 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.45ms
+2026-09-10 20:13:35 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.31ms
+2026-09-10 20:13:35 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:35] "GET /refs/employees HTTP/1.1" 200 -
+2026-09-10 20:13:42 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:42] "[32mGET /refs/employees/edit/af61323e-78e0-45ff-9f97-552d4f880da7 HTTP/1.1[0m" 302 -
+2026-09-10 20:13:42 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.40ms
+2026-09-10 20:13:42 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.30ms
+2026-09-10 20:13:42 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:42] "GET /refs/employees HTTP/1.1" 200 -
+2026-09-10 20:13:48 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:48] "[32mGET /change_password?user_id=af61323e-78e0-45ff-9f97-552d4f880da7 HTTP/1.1[0m" 302 -
+2026-09-10 20:13:48 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.31ms
+2026-09-10 20:13:48 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:48] "GET / HTTP/1.1" 200 -
+2026-09-10 20:13:52 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.35ms
+2026-09-10 20:13:52 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.29ms
+2026-09-10 20:13:52 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:13:52] "GET /refs/employees HTTP/1.1" 200 -
+2026-09-10 20:14:21 | INFO     | DB_OPERATION | table=employees | op=INSERT | duration=82.91ms
+2026-09-10 20:14:21 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:21] "[32mPOST /refs/employees HTTP/1.1[0m" 302 -
+2026-09-10 20:14:21 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.30ms
+2026-09-10 20:14:21 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.41ms
+2026-09-10 20:14:22 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:22] "GET /refs/employees HTTP/1.1" 200 -
+2026-09-10 20:14:33 | INFO     | DB_OPERATION | table=action_log | op=SELECT | duration=149.62ms
+2026-09-10 20:14:33 | INFO     | DB_OPERATION | table=action_log | op=SAVE | duration=497.09ms
+2026-09-10 20:14:33 | INFO     | DB_OPERATION | table=action_log | op=INSERT
+2026-09-10 20:14:33 | INFO     | USER_ACTION | user_id=2748740a-f7af-47cc-b95c-fd7e4f8635b2 | action=LOGOUT | details=User logged out | ip=
+2026-09-10 20:14:33 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:33] "[32mGET /logout HTTP/1.1[0m" 302 -
+2026-09-10 20:14:33 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.28ms
+2026-09-10 20:14:33 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:33] "GET /login HTTP/1.1" 200 -
+2026-09-10 20:14:37 | INFO     | DB_OPERATION | table=action_log | op=SELECT | duration=141.63ms
+2026-09-10 20:14:37 | INFO     | DB_OPERATION | table=action_log | op=SAVE | duration=477.27ms
+2026-09-10 20:14:37 | INFO     | DB_OPERATION | table=action_log | op=INSERT
+2026-09-10 20:14:37 | INFO     | USER_ACTION | user_id=09b272bd-c441-4de2-a9dd-7870b94aa199 | action=LOGIN | details=User Админ logged in | ip=
+2026-09-10 20:14:37 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:37] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-09-10 20:14:37 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.41ms
+2026-09-10 20:14:37 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:37] "GET / HTTP/1.1" 200 -
+2026-09-10 20:14:40 | INFO     | DB_OPERATION | table=card_types | op=SELECT | duration=0.31ms
+2026-09-10 20:14:40 | INFO     | DB_OPERATION | table=organizations | op=SELECT | duration=0.50ms
+2026-09-10 20:14:40 | INFO     | DB_OPERATION | table=mfcs | op=SELECT | duration=5.96ms
+2026-09-10 20:14:40 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.37ms
+2026-09-10 20:14:40 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.72ms
+2026-09-10 20:14:40 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:40] "GET /docs/create/issue HTTP/1.1" 200 -
+2026-09-10 20:14:42 | INFO     | DB_OPERATION | table=cards | op=SELECT | duration=97.20ms
+2026-09-10 20:14:42 | INFO     | DB_OPERATION | table=owners | op=SELECT | duration=19.64ms
+2026-09-10 20:14:42 | INFO     | DB_OPERATION | table=card_types | op=SELECT | duration=1.82ms
+2026-09-10 20:14:42 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:14:42] "GET /api/cards?q=&status=ready_to_issue HTTP/1.1" 200 -
+2026-09-10 20:15:41 | INFO     | DB_OPERATION | table=cards | op=SELECT | duration=92.30ms
+2026-09-10 20:15:41 | INFO     | DB_OPERATION | table=owners | op=SELECT | duration=18.89ms
+2026-09-10 20:15:41 | INFO     | DB_OPERATION | table=card_types | op=SELECT | duration=0.36ms
+2026-09-10 20:15:41 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:15:41] "GET /api/cards?q=&status=ready_to_issue&owner=п HTTP/1.1" 200 -
+2026-09-10 20:15:41 | INFO     | DB_OPERATION | table=cards | op=SELECT | duration=78.31ms
+2026-09-10 20:15:41 | INFO     | DB_OPERATION | table=owners | op=SELECT | duration=15.07ms
+2026-09-10 20:15:41 | INFO     | DB_OPERATION | table=card_types | op=SELECT | duration=0.36ms
+2026-09-10 20:15:41 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:15:41] "GET /api/cards?q=&status=ready_to_issue&owner=па HTTP/1.1" 200 -
+2026-09-10 20:15:43 | INFO     | DB_OPERATION | table=cards | op=SELECT | duration=88.00ms
+2026-09-10 20:15:43 | INFO     | DB_OPERATION | table=owners | op=SELECT | duration=17.07ms
+2026-09-10 20:15:43 | INFO     | DB_OPERATION | table=card_types | op=SELECT | duration=0.36ms
+2026-09-10 20:15:43 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:15:43] "GET /api/cards?q=&status=ready_to_issue&owner=пал HTTP/1.1" 200 -
+2026-09-10 20:15:56 | INFO     | DB_OPERATION | table=counters | op=GET_NEXT_NUMBER | duration=80.65ms
+2026-09-10 20:15:56 | INFO     | DB_OPERATION | table=documents | op=INSERT | duration=71.18ms
+2026-09-10 20:15:56 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:15:56] "[32mPOST /docs/create/issue HTTP/1.1[0m" 302 -
+2026-09-10 20:15:56 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=144.35ms
+2026-09-10 20:15:56 | INFO     | DB_OPERATION | table=documents | op=FIND_ONE | duration=153.61ms
+2026-09-10 20:15:56 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:15:56] "[32mGET /docs/edit/d24b3e82-1ada-4c2b-83d3-248524e105aa HTTP/1.1[0m" 302 -
+2026-09-10 20:15:56 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=160.19ms
+2026-09-10 20:15:56 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=1.12ms
+2026-09-10 20:15:56 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.42ms
+2026-09-10 20:15:56 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:15:56] "GET /docs HTTP/1.1" 200 -
+2026-09-10 20:16:14 | INFO     | DB_OPERATION | table=documents | op=SELECT | duration=144.66ms
+2026-09-10 20:16:14 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.34ms
+2026-09-10 20:16:14 | INFO     | DB_OPERATION | table=employees | op=SELECT | duration=0.30ms
+2026-09-10 20:16:15 | INFO     | 192.168.110.81 - - [10/Sep/2026 20:16:15] "GET /docs?date_from=2026-09-10&date_to=2026-09-10 HTTP/1.1" 200 -

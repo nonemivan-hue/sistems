@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Анализ потребности{% endblock %}
+{% block page_title %}Отчет: Анализ потребности{% endblock %}
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('report_demand_analysis') }}">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">Дата начала</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" required value="{{ start_date if start_date else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">Дата окончания</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" required value="{{ end_date if end_date else '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="days_forecast" class="form-label">Дней прогноза</label>
+                    <input type="number" class="form-control" id="days_forecast" name="days_forecast" value="30" min="1" max="365">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Сформировать отчет</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if report %}
+<div class="card">
+    <div class="card-body">
+        <h6 class="card-subtitle mb-3 text-muted">
+            Период: {{ start_date }} - {{ end_date }} ({{ period_days }} дн.) | Прогноз на {{ days_forecast }} дней
+        </h6>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th class="align-middle">Вид карты</th>
+                        <th class="text-center align-middle">Остаток</th>
+                        <th class="text-center align-middle">Печать за период</th>
+                        <th class="text-center align-middle">Остаток в днях</th>
+                        <th class="text-center align-middle bg-secondary text-white">Необходимо на {{ days_forecast }} дней</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report %}
+                    <tr>
+                        <td class="fw-bold">{{ row.card_type_name }}</td>
+                        <td class="text-center">{{ row.stock }}</td>
+                        <td class="text-center">{{ row.printed }}</td>
+                        <td class="text-center {% if row.days_remaining and row.days_remaining < 7 %}table-danger{% elif row.days_remaining and row.days_remaining < 14 %}table-warning{% endif %}">
+                            {{ row.days_remaining if row.days_remaining is not none else '∞' }}
+                        </td>
+                        <td class="text-center fw-bold bg-light">{{ row.required_qty }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td class="fw-bold">Итого</td>
+                        <td class="text-center fw-bold">{{ report | sum(attribute='stock') }}</td>
+                        <td class="text-center fw-bold">{{ report | sum(attribute='printed') }}</td>
+                        <td class="text-center">-</td>
+                        <td class="text-center fw-bold bg-secondary text-white">{{ report | sum(attribute='required_qty') }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

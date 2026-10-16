@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Журнал инвентаризации{% endblock %}
+{% block page_title %}Журнал инвентаризации карт{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between">
+        <div></div>
+        <a href="{{ url_for('inventory_create') }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> Создать
+        </a>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3 mb-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Дата с</label>
+                <input type="date" name="date_from" class="form-control" value="{{ date_from or '' }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Дата по</label>
+                <input type="date" name="date_to" class="form-control" value="{{ date_to or '' }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Применить</button>
+                <a href="{{ url_for('inventory_journal') }}" class="btn btn-outline-secondary">Сброс</a>
+            </div>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>№</th><th>Дата</th><th>Статус</th><th>Автор</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.doc_number }}</td>
+                    <td>{{ item.doc_date }}</td>
+                    <td>
+                        {% if item.status == 'posted' %}
+                        <span class="badge bg-success">Проведен</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Черновик</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ emp_map.get(item.created_by, {}).full_name if item.created_by else '—' }}</td>
+                    <td>
+                        <a href="{{ url_for('inventory_edit', inv_id=item.id) }}" class="btn btn-sm btn-outline-primary">Открыть</a>
+                        <a href="{{ url_for('inventory_print', inv_id=item.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-printer"></i> Печать
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">Нет документов</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
