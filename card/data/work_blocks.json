@@ -1,0 +1,20 @@
+[
+  {
+    "id": "block-karty-0001",
+    "name": "Карты",
+    "url": "/refs/cards",
+    "icon": "bi-credit-card",
+    "order": 1,
+    "allowed_logins": [],
+    "created_at": "2026-10-16T10:00:00"
+  },
+  {
+    "id": "block-prikazy-0002",
+    "name": "Приказы",
+    "url": "/docs?type=issue",
+    "icon": "bi-journal-text",
+    "order": 2,
+    "allowed_logins": [],
+    "created_at": "2026-10-16T10:00:00"
+  }
+]

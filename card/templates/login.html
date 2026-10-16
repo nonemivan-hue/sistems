@@ -55,6 +55,7 @@
         {% endwith %}
 
         <form method="POST" action="{{ url_for('login') }}">
+            {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
             <div class="mb-3">
                 <label class="form-label">Логин</label>
                 <input type="text" name="login" class="form-control" required autofocus>

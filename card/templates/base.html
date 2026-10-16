@@ -133,6 +133,15 @@
                 <i class="bi bi-journal-text"></i> Журнал документов
             </a>
 
+            {% if work_blocks %}
+            <div class="mt-3 px-3 text-uppercase" style="font-size:0.7rem;opacity:0.6;">Блоки работы</div>
+            {% for b in work_blocks %}
+            <a class="nav-link {% if request.endpoint == 'blocks_index' %}active{% endif %}" href="{{ url_for('block_enter', block_id=b.id) }}" title="{{ b.url }}">
+                <i class="bi {{ b.icon|default('bi-box') }}"></i> {{ b.name }}
+            </a>
+            {% endfor %}
+            {% endif %}
+
             {% if not is_issue_user %}
             <div class="mt-3 px-3 text-uppercase" style="font-size:0.7rem;opacity:0.6;">Отчеты</div>
             <a class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}" href="{{ url_for('reports') }}">
@@ -153,6 +162,9 @@
             </a>
             <a class="nav-link {% if request.endpoint == 'backup_index' %}active{% endif %}" href="{{ url_for('backup_index') }}">
                 <i class="bi bi-cloud-arrow-up"></i> Резервное копирование
+            </a>
+            <a class="nav-link {% if request.endpoint in ('admin_blocks', 'admin_blocks_edit') %}active{% endif %}" href="{{ url_for('admin_blocks') }}">
+                <i class="bi bi-diagram-3"></i> Блоки работы (доступ)
             </a>
             {% endif %}
         </nav>

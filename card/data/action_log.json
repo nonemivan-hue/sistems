@@ -229718,5 +229718,125 @@
     "timestamp": "2026-10-16T13:14:11.087053",
     "id": "2a597a2a-21cb-446b-b834-c22835054004",
     "created_at": "2026-10-16T13:14:11.236801"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "LOGIN",
+    "details": "User Админ logged in",
+    "timestamp": "2026-10-16T11:18:22.815937",
+    "id": "c19d2f95-cdf6-4ee9-88c2-ea154d272265",
+    "created_at": "2026-10-16T11:18:22.902871"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "BLOCK_CREATE",
+    "details": "Создан блок 'Карты' -> /refs/cards",
+    "timestamp": "2026-10-16T11:18:23.137188",
+    "id": "69dbcaad-4b06-4343-83e8-02b568352071",
+    "created_at": "2026-10-16T11:18:23.186622"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "BLOCK_CREATE",
+    "details": "Создан блок 'Приказы' -> http://10.0.0.5/prikazy/",
+    "timestamp": "2026-10-16T11:18:23.402826",
+    "id": "b2610761-c95c-49d3-9dfa-3395ddfa2110",
+    "created_at": "2026-10-16T11:18:23.452514"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "BLOCK_ENTER",
+    "details": "Вход в блок 'Карты' с автопередачей учетных данных",
+    "timestamp": "2026-10-16T11:18:23.687322",
+    "id": "d39aafbd-a1b6-4261-9cf1-323a768138c4",
+    "created_at": "2026-10-16T11:18:23.738242"
+  },
+  {
+    "user_id": "3b5223bf-c70c-47c9-960a-ac40ac91e7a9",
+    "action": "LOGIN",
+    "details": "User Харлампиди logged in",
+    "timestamp": "2026-10-16T11:18:23.969598",
+    "id": "92301de9-1759-405d-934f-396e767fb834",
+    "created_at": "2026-10-16T11:18:24.016478"
+  },
+  {
+    "user_id": "3b5223bf-c70c-47c9-960a-ac40ac91e7a9",
+    "action": "BLOCK_DENIED",
+    "details": "Доступ к блоку 'Приказы' запрещен",
+    "timestamp": "2026-10-16T11:18:24.240444",
+    "id": "417e19aa-f313-493d-a841-c40e1b8020b4",
+    "created_at": "2026-10-16T11:18:24.287415"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "LOGIN",
+    "details": "User Админ logged in",
+    "timestamp": "2026-10-16T11:18:53.037698",
+    "id": "0fb5b823-7d05-476c-be60-f771b967f5e3",
+    "created_at": "2026-10-16T11:18:53.090865"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "BLOCK_CREATE",
+    "details": "Создан блок 'Карты' -> /refs/cards",
+    "timestamp": "2026-10-16T11:18:53.304279",
+    "id": "8e592223-de09-44b9-bdea-efa29bc53219",
+    "created_at": "2026-10-16T11:18:53.367386"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "BLOCK_CREATE",
+    "details": "Создан блок 'Приказы' -> http://10.0.0.5/prikazy/",
+    "timestamp": "2026-10-16T11:18:53.579789",
+    "id": "0b0c5845-c68f-4504-8deb-c640a1674aae",
+    "created_at": "2026-10-16T11:18:53.629845"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "BLOCK_ENTER",
+    "details": "Вход в блок 'Карты' с автопередачей учетных данных",
+    "timestamp": "2026-10-16T11:18:53.869486",
+    "id": "965e2399-296d-4d3d-abe4-9597f9232738",
+    "created_at": "2026-10-16T11:18:53.924019"
+  },
+  {
+    "user_id": "af61323e-78e0-45ff-9f97-552d4f880da7",
+    "action": "SSO_LOGIN",
+    "details": "Авто Вход по ссылке блока 'Карты'",
+    "timestamp": "2026-10-16T11:18:54.142856",
+    "id": "0316566f-8a7c-48a2-ac3f-d3829b98c5b4",
+    "created_at": "2026-10-16T11:18:54.192537"
+  },
+  {
+    "user_id": "3b5223bf-c70c-47c9-960a-ac40ac91e7a9",
+    "action": "SSO_LOGIN",
+    "details": "Авто вход по ссылке блока 'Карты'",
+    "timestamp": "2026-10-16T11:18:54.418842",
+    "id": "c1517809-2bcb-4b3f-bf35-1425f8e4bb4b",
+    "created_at": "2026-10-16T11:18:54.476604"
+  },
+  {
+    "user_id": "3b5223bf-c70c-47c9-960a-ac40ac91e7a9",
+    "action": "SSO_LOGIN",
+    "details": "Авто вход по ссылке блока 'Карты'",
+    "timestamp": "2026-10-16T11:18:56.426002",
+    "id": "9bc85e1f-f3d5-4138-87e6-9db67d617c20",
+    "created_at": "2026-10-16T11:18:56.477983"
+  },
+  {
+    "user_id": "3b5223bf-c70c-47c9-960a-ac40ac91e7a9",
+    "action": "LOGIN",
+    "details": "User Харлампиди logged in",
+    "timestamp": "2026-10-16T11:18:56.784160",
+    "id": "2c114c22-d0b2-47e0-a365-5a523a8f9868",
+    "created_at": "2026-10-16T11:18:56.832337"
+  },
+  {
+    "user_id": "3b5223bf-c70c-47c9-960a-ac40ac91e7a9",
+    "action": "BLOCK_DENIED",
+    "details": "Доступ к блоку 'Приказы' запрещен",
+    "timestamp": "2026-10-16T11:18:57.053227",
+    "id": "c8eb2dab-608b-4ac1-9155-d24a80b5e739",
+    "created_at": "2026-10-16T11:18:57.098361"
   }
 ]

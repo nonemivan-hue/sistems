@@ -20,7 +20,12 @@ os.makedirs(BACKUP_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 from app.storage import load_all, save_all, insert, update, delete, get_next_number, find_one
+import hashlib
+import hmac
+import time as _time
 from app.models import (
+    get_work_blocks, get_work_block_by_id, create_work_block,
+    update_work_block, delete_work_block, can_access_block, get_visible_blocks,
     get_cards, get_card_by_number, create_or_update_card,
     get_card_types, get_card_type_by_id, get_card_type_by_name,
     get_owners, get_owner_by_id, create_owner_if_not_exists,
@@ -55,9 +60,19 @@ DOC_PREFIXES = {
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        # Support autologin via one-time SSO token (transfer of account when entering a work block)
+        if "user_id" not in session:
+            sso_block_id, sso_user_id = check_sso_token(request.args.get("sso_token", ""))
+            if sso_block_id and sso_user_id:
+                sso_block = get_work_block_by_id(sso_block_id)
+                sso_user = get_employee_by_id(sso_user_id)
+                if sso_block and sso_user and can_access_block(sso_user, sso_block):
+                    session["user_id"] = sso_user["id"]
+                    session["user_name"] = sso_user.get("full_name", "")
+                    log_action(sso_user["id"], "SSO_LOGIN", f"Авто вход по ссылке блока '{sso_block.get('name')}'")
         if "user_id" not in session:
             flash("Необходима авторизация", "warning")
-            return redirect(url_for("login"))
+            return redirect(url_for("login", next=request.full_path))
         # Register/update active session
         from app.models import register_session, update_session_activity
         session_id = str(session.get("user_id", ""))
@@ -104,6 +119,53 @@ def is_reports_user():
     return "reports" in roles and "admin" not in roles and "user" not in roles and "issue" not in roles
 
 
+# ============== WORK BLOCKS SSO (автопередача учетных данных) ==============
+SSO_LINK_TTL = 300  # секунд, в течение которых действует ссылка автовхода
+
+BLOCK_ICONS = {
+    "bi-box": "Блок",
+    "bi-credit-card": "Карты",
+    "bi-journal-text": "Приказы / Документы",
+    "bi-file-earmark-text": "Файл / Документ",
+    "bi-graph-up": "Отчеты",
+    "bi-people": "Персонал",
+    "bi-gear": "Настройки",
+    "bi-link-45deg": "Ссылка",
+}
+
+
+def _sso_secret():
+    """Секрет для подписи SSO-ссылок: app.secret_key + соль."""
+    base = str(app.secret_key)
+    return hashlib.sha256(("work-block-sso:" + base).encode("utf-8")).hexdigest()
+
+
+def make_sso_token(block_id, user_id):
+    """Подписанный токен автовхода: block|user|ts|hmac. Действует SSO_LINK_TTL секунд."""
+    ts = str(int(_time.time()))
+    msg = f"{block_id}|{user_id}|{ts}"
+    sig = hmac.new(_sso_secret().encode("utf-8"), msg.encode("utf-8"), hashlib.sha256).hexdigest()[:32]
+    return f"{msg}|{sig}"
+
+
+def check_sso_token(token):
+    """Проверка токена автовхода. Возвращает (block_id, user_id) или (None, None)."""
+    try:
+        parts = token.split("|")
+        if len(parts) != 4:
+            return None, None
+        block_id, user_id, ts, sig = parts
+        msg = f"{block_id}|{user_id}|{ts}"
+        expected = hmac.new(_sso_secret().encode("utf-8"), msg.encode("utf-8"), hashlib.sha256).hexdigest()[:32]
+        if not hmac.compare_digest(sig, expected):
+            return None, None
+        if abs(_time.time() - int(ts)) > SSO_LINK_TTL:
+            return None, None
+        return block_id, user_id
+    except Exception:
+        return None, None
+
+
 # ============== CONTEXT PROCESSOR ==============
 @app.context_processor
 def inject_globals():
@@ -121,7 +183,8 @@ def inject_globals():
         "is_admin": user and "admin" in user.get("roles", []),
         "is_issue_user": is_issue_user(),
         "is_reports_user": is_reports_user(),
-        "active_users": active_users
+        "active_users": active_users,
+        "work_blocks": get_visible_blocks(user) if user else [],
     }
 
 
@@ -134,6 +197,24 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    # Авто вход по одноразовому токену (передача учетной записи из блока)
+    sso_block_id, sso_user_id = check_sso_token(request.values.get("sso_token", ""))
+    if sso_block_id and sso_user_id:
+        sso_block = get_work_block_by_id(sso_block_id)
+        sso_user = get_employee_by_id(sso_user_id)
+        if sso_block and sso_user and can_access_block(sso_user, sso_block):
+            session["user_id"] = sso_user["id"]
+            session["user_name"] = sso_user.get("full_name", "")
+            log_action(sso_user["id"], "SSO_LOGIN", f"Авто вход по ссылке блока '{sso_block.get('name')}'")
+            flash(f"Авто вход выполнен: {sso_user.get('full_name', '')}", "success")
+            next_url = request.values.get("next") or ""
+            if next_url.startswith("/") and not next_url.startswith("//"):
+                return redirect(next_url)
+            return redirect(url_for("index"))
+        flash("Ссылка автовхода недействительна. Требуется обычный вход.", "danger")
+    elif request.values.get("sso_token"):
+        flash("Ссылка автовхода устарела. Войдите обычным способом.", "warning")
+
     if request.method == "POST":
         login_name = request.form.get("login", "").strip()
         password = request.form.get("password", "").strip()
@@ -143,9 +224,12 @@ def login():
             session["user_name"] = user.get("full_name", "")
             log_action(user["id"], "LOGIN", f"User {login_name} logged in")
             flash(f"Добро пожаловать, {user.get('full_name', '')}!", "success")
+            next_url = request.form.get("next") or request.args.get("next") or ""
+            if next_url.startswith("/") and not next_url.startswith("//"):
+                return redirect(next_url)
             return redirect(url_for("index"))
         flash("Неверный логин или пароль", "danger")
-    return render_template("login.html")
+    return render_template("login.html", next_url=request.args.get("next", ""))
 
 
 @app.route("/logout")
@@ -159,6 +243,139 @@ def logout():
     session.clear()
     flash("Вы вышли из системы", "info")
     return redirect(url_for("login"))
+
+
+# ============== WORK BLOCKS (Блоки для работы учреждения) ==============
+@app.route("/blocks")
+@login_required
+def blocks_index():
+    """Страница со всеми доступными сотруднику блоками работы."""
+    user = get_employee_by_id(session["user_id"])
+    blocks = get_visible_blocks(user)
+    return render_template("blocks.html", blocks=blocks)
+
+
+@app.route("/blocks/enter/<block_id>")
+@login_required
+def block_enter(block_id):
+    """Кнопка блока: формирует одноразовый токен автовхода и перенаправляет
+    сотрудника по ссылке блока с передачей учетной записи (без окна логина)."""
+    user = get_employee_by_id(session["user_id"])
+    block = get_work_block_by_id(block_id)
+    if not block:
+        flash("Блок не найден", "danger")
+        return redirect(url_for("blocks_index"))
+    if not can_access_block(user, block):
+        log_action(user["id"], "BLOCK_DENIED", f"Доступ к блоку '{block.get('name')}' запрещен")
+        flash("Вам запрещен доступ к данному блоку. Обратитесь к администратору.", "danger")
+        return redirect(url_for("blocks_index"))
+    url = (block.get("url") or "").strip()
+    if not url:
+        flash("Для блока не задан путь (ссылка). Обратитесь к администратору.", "warning")
+        return redirect(url_for("blocks_index"))
+    token = make_sso_token(block_id, user["id"])
+    sep = "&" if "?" in url else "?"
+    target = f"{url}{sep}sso_token={token}"
+    log_action(user["id"], "BLOCK_ENTER", f"Вход в блок '{block.get('name')}' с автопередачей учетных данных")
+    return render_template("block_redirect.html", block=block, target=target)
+
+
+@app.route("/sso/consume", methods=["GET", "POST"])
+def sso_consume():
+    """Приём учётных данных от другого сервиса (для внешних систем на базе
+    этого приложения): проверяется подписанный токен, и сотрудник получает
+    собственную сессию без ввода логина и пароля."""
+    token = request.values.get("sso_token", "")
+    block_id, user_id = check_sso_token(token)
+    if not block_id or not user_id:
+        flash("Ссылка автовхода недействительна или устарела", "danger")
+        return redirect(url_for("login"))
+    block = get_work_block_by_id(block_id)
+    if block:
+        target_user = get_employee_by_id(user_id)
+        if target_user and not can_access_block(target_user, block):
+            flash("Вам запрещен доступ к данному блоку", "danger")
+            return redirect(url_for("login"))
+    user = get_employee_by_id(user_id)
+    if not user:
+        flash("Учетная запись не найдена", "danger")
+        return redirect(url_for("login"))
+    session["user_id"] = user["id"]
+    session["user_name"] = user.get("full_name", "")
+    from app.models import register_session as _reg_sess
+    _reg_sess(user["id"], str(user["id"]))
+    log_action(user["id"], "SSO_LOGIN", f"Авто Вход по ссылке блока '{block.get('name') if block else block_id}'")
+    flash(f"Авто Вход выполнен: {user.get('full_name', '')}", "success")
+    next_url = request.values.get("next") or ""
+    if next_url.startswith("/") and not next_url.startswith("//"):
+        return redirect(next_url)
+    return redirect(url_for("index"))
+
+
+def _parse_block_form(form):
+    name = form.get("name", "").strip()
+    url = form.get("url", "").strip()
+    icon = form.get("icon", "bi-box").strip() or "bi-box"
+    try:
+        order = int(form.get("order", 0) or 0)
+    except ValueError:
+        order = 0
+    allowed = [x.strip() for x in form.getlist("allowed_logins") if x.strip()]
+    return name, url, icon, order, allowed
+
+
+@app.route("/admin/blocks", methods=["GET", "POST"])
+@login_required
+@admin_required
+def admin_blocks():
+    """Администрирование блоков работы: название, путь (ссылка), доступ."""
+    if request.method == "POST":
+        name, url, icon, order, allowed = _parse_block_form(request.form)
+        if not name or not url:
+            flash("Укажите название блока и путь (ссылку)", "danger")
+            return redirect(url_for("admin_blocks"))
+        create_work_block(name, url, icon=icon, order=order, allowed_logins=allowed)
+        log_action(session["user_id"], "BLOCK_CREATE", f"Создан блок '{name}' -> {url}")
+        flash(f"Блок '{name}' добавлен", "success")
+        return redirect(url_for("admin_blocks"))
+    blocks = get_work_blocks()
+    employees = get_employees()
+    return render_template("admin_blocks.html", blocks=blocks, employees=employees, icons=BLOCK_ICONS)
+
+
+@app.route("/admin/blocks/edit/<item_id>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def admin_blocks_edit(item_id):
+    block = get_work_block_by_id(item_id)
+    if not block:
+        flash("Блок не найден", "danger")
+        return redirect(url_for("admin_blocks"))
+    if request.method == "POST":
+        name, url, icon, order, allowed = _parse_block_form(request.form)
+        if not name or not url:
+            flash("Укажите название блока и путь (ссылку)", "danger")
+            return redirect(url_for("admin_blocks_edit", item_id=item_id))
+        update_work_block(item_id, {
+            "name": name, "url": url, "icon": icon, "order": order, "allowed_logins": allowed
+        })
+        log_action(session["user_id"], "BLOCK_UPDATE", f"Изменен блок '{name}'")
+        flash(f"Блок '{name}' обновлен", "success")
+        return redirect(url_for("admin_blocks"))
+    employees = get_employees()
+    return render_template("admin_blocks_edit.html", block=block, employees=employees, icons=BLOCK_ICONS)
+
+
+@app.route("/admin/blocks/delete/<item_id>", methods=["POST"])
+@login_required
+@admin_required
+def admin_blocks_delete(item_id):
+    block = get_work_block_by_id(item_id)
+    if block:
+        delete_work_block(item_id)
+        log_action(session["user_id"], "BLOCK_DELETE", f"Удален блок '{block.get('name')}'")
+        flash("Блок удален", "success")
+    return redirect(url_for("admin_blocks"))
 
 
 @app.route("/change_password", methods=["GET", "POST"])

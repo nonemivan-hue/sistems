@@ -993,3 +993,54 @@ def create_docs_from_inventory(inv_id, user_id=None):
         created_docs.append(doc["id"])
     
     return created_docs
+
+
+# ============== WORK BLOCKS (Блоки для работы учреждения) ==============
+def get_work_blocks():
+    """Список всех блоков работы (Карты, Приказы и др.), отсортированных по порядку."""
+    blocks = load_all("work_blocks")
+    return sorted(blocks, key=lambda b: (b.get("order", 0), b.get("name", "")))
+
+
+def get_work_block_by_id(block_id):
+    return find_one("work_blocks", lambda b: b.get("id") == block_id)
+
+
+def create_work_block(name, url, icon="bi-box", order=0, allowed_logins=None):
+    """Создать блок работы. name - название, url - путь/ссылка к блоку,
+    allowed_logins - список логинов сотрудников, которым разрешен вход в блок
+    (пустой список / None = всем)."""
+    return insert("work_blocks", {
+        "name": name,
+        "url": url,
+        "icon": icon or "bi-box",
+        "order": order,
+        "allowed_logins": allowed_logins or [],
+    })
+
+
+def update_work_block(block_id, updates):
+    return update("work_blocks", lambda b: b.get("id") == block_id, updates)
+
+
+def delete_work_block(block_id):
+    delete("work_blocks", lambda b: b.get("id") == block_id)
+
+
+def can_access_block(employee, block):
+    """Проверить доступ сотрудника к блоку.
+    Администратор имеет доступ всегда; иначе логин сотрудника должен быть
+    в списке разрешенных (пустой список = доступ для всех)."""
+    if not employee:
+        return False
+    if "admin" in employee.get("roles", []):
+        return True
+    allowed = block.get("allowed_logins") or []
+    if not allowed:
+        return True
+    return employee.get("login") in allowed
+
+
+def get_visible_blocks(employee):
+    """Блоки, доступные данному сотруднику."""
+    return [b for b in get_work_blocks() if can_access_block(employee, b)]

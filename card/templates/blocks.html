@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Блоки работы - Учет транспортных карт{% endblock %}
+{% block page_title %}Блоки работы{% endblock %}
+
+{% block content %}
+<p class="text-muted">Выберите блок для перехода. Учетная запись передается автоматически — вводить логин и пароль не потребуется.</p>
+
+<div class="row g-4">
+    {% for b in blocks %}
+    <div class="col-md-4 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi {{ b.icon|default('bi-box') }} display-4 text-primary"></i>
+                <h5 class="card-title mt-3">{{ b.name }}</h5>
+                <p class="card-text text-muted small text-break">{{ b.url }}</p>
+                <a href="{{ url_for('block_enter', block_id=b.id) }}" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> Войти в блок
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            Блоки работы еще не настроены. Попросите администратора добавить блоки
+            в разделе «Администрирование → Блоки работы (доступ)».
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
