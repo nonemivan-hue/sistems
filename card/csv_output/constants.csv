@@ -1,0 +1,4 @@
+key,value
+,
+backup_schedule_time,20:00
+backup_enabled,true
