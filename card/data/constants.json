@@ -1,0 +1,16 @@
+[
+  {
+    "key": "",
+    "value": "",
+    "organization_name": "ГКУ КК УСЗН в городе-курорте Геленджике",
+    "updated_at": "2026-09-14T11:14:18.112795"
+  },
+  {
+    "key": "backup_schedule_time",
+    "value": "20:00"
+  },
+  {
+    "key": "backup_enabled",
+    "value": "true"
+  }
+]
